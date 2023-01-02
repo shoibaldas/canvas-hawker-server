@@ -2,8 +2,7 @@ const express = require("express");
 const authController = require("../controllers/auth");
 const validator = require("../middleware/validation");
 const postController = require("../controllers/postContent");
-const commentController = require("../controllers/postComment")
-const { checkAuth } = require("../middleware/authCheck");
+const uploadImage = require('../middleware/upload-image');
 
 const router = express.Router();
 
@@ -11,3 +10,6 @@ const router = express.Router();
 router.post("/api/v1/signup", validator.signup, authController.signup);
 //signIn
 router.post("/api/v1/signin", validator.signin, authController.signin);
+
+//creating post
+router.post("/api/v1/addPost", uploadImage, postController.createPost);
