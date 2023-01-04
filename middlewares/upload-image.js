@@ -1,28 +1,34 @@
-const multer = require("multer");
+ const multer = require("multer");
 
-const MIME_TYPE_MAP = {
-  "image/png": "png",
-  "image/jpeg": "jpg",
-  "image/jpg": "jpg"
-};
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const isValid = MIME_TYPE_MAP[file.mimetype];
-    let error = new Error("The media type is incorrect");
-    if (isValid) {
-      error = null;
+ const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "images");
+    },
+    filename: (req, file, cb) => {
+      cb(
+        null,
+        file.originalname.split(".")[0].replace(/\ /g, "") +
+          Date.now() +
+          path.extname(file.originalname)
+      );
+    },
+  });
+  
+  const checkImage = (req, file, cb) => {
+    if (
+      file.mimetype === "image/jpeg" ||
+      file.mimetype === "image/jpg" ||
+      file.mimetype === "image/png"
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false);
     }
-    cb(error, "images");
-  },
-  filename: (req, file, cb) => {
-    const name = file.originalname
-      .toLowerCase()
-      .split(" ")
-      .join("-");
-    const ext = MIME_TYPE_MAP[file.mimetype];
-    cb(null, name + "-" + Date.now() + "." + ext);
-  }
-});
+  };
+  
+  const upload = multer({
+    storage: fileStorage,
+    fileFilter: checkImage,
+  });
 
-module.exports = multer({ storage: storage }).single("image");
+module.exports = upload.single("image");

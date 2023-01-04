@@ -16,20 +16,26 @@ class authController {
                     .status(HTTP_STATUS.UNPROCESSABLE_ENTITY)
                     .send(failure("Invalid inputs", errors.array()));
             }
-            const username = req.body.username;
+            const firstName = req.body.firstName;
+            const lastName = req.body.lastName;
             const email = req.body.email;
             const password = await bcrypt.hash(req.body.password, 10);
+            const role = 'User';
             const user = new User({
-                username,
+                firstName,
+                lastName,
                 email,
-                password
+                password,
+                role
             });
             await user.save();
 
             const userData = {
                 _id: user._id,
-                username: user.username,
-                email: user.email
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role
             };
 
             const jwtToken = jwt.sign(userData, process.env.JWT_SECRET_KEY, {
@@ -75,8 +81,10 @@ class authController {
 
             const userData = {
                 _id: user._id,
-                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
+                role: user.role
             };
 
             const jwtToken = jwt.sign(userData, process.env.JWT_SECRET_KEY, {
